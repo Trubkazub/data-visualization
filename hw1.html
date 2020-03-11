@@ -1,26 +1,43 @@
-<!DOCTYPE>
-<html> 
-<head> 
-	<title>lab 1</title> 
-	<meta charset="utf8">
-    <style type="text/css"> 
-    	rect{ display: none;} 
-        .up_smile:active(dispLay: none;} 
-        .up_smile:active + rect{ display: block;}
-        .down_smile:active(dispLay: none;} 
-        .down_smile:active + rect{ display: block;}
-     	 #wq > input:checked + span {color:red;}
-    </style> 
-</head> 
-	<body> 
-      	<input type="checkbox" name=""><span>Some text</span>
-		<svg width="500" height="300"> 
-			<circle cx="250" cy="150" r="150" fill="yellow"> 
-			</circle> 
-			<ellipse cx="300" cy="100" rx="25" ry="50" fill="black"></ellipse> 
-			<ellipse cx="180" cy="100" rx="25" ry="50" fill="black"></ellipse> 
-            <path class='up_smile' d=" M 190, 220 A55,55 60 0 0 280, 190" stroke="black" stroke-width="2" fill-opacity="0"/> 
-            <path class='down_smile' d=" M 200 250 A40,55 60 1 1 290, 200" stroke="black" stroke-width="2" fill-opacity="0"/> 
-		</svg> 
-	</body> 
-</html>  
+<!DOCTYPE html>
+<html>
+<head>
+  <title>lab 1</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <script type="text/javascript"
+    src="//code.jquery.com/jquery-3.1.1.js"  
+  ></script>
+  <style id="compiled-css" type="text/css">
+      .hide {display: none;}
+  </style>
+
+  <script type="text/javascript">
+
+    window.onload=function(){
+      
+$('#up_smile').addClass('hide');
+$('#start').on('change', function() {
+    if ( $(this).prop('checked') ) {
+        $('#down_smile').addClass('hide');
+        $('#up_smile').removeClass('hide');
+        $(this).parent().find('span').html('Happy');
+    } else {
+        $('#down_smile').removeClass('hide');
+        $('#up_smile').addClass('hide');
+        $(this).parent().find('span').html('Sad');
+    }
+});
+}</script>
+
+</head>
+<body>
+    <svg width="500" height="300"  > 
+        <circle cx="250" cy="150" r="150" fill="yellow"> </circle> 
+        <ellipse class='smile' cx="300" cy="100" rx="25" ry="50" fill="black"></ellipse>  
+        <ellipse cx="180" cy="100" rx="25" ry="50" fill="black"></ellipse> 
+        <path id='up_smile' d=" M 190, 220 A55,55 60 0 0 280, 190" stroke="black"stroke-width="9" fill-opacity="0"/> 
+        <path id='down_smile' d=" M 200 250 A40,55 60 1 1 290, 200" stroke="black" stroke-width="9" fill-opacity="0"/>
+    </svg>
+    <label class="checkbox" id="label">
+    <input type="checkbox" class="favourites_flag" id="start" value="Избранное"> <span>Sad</span></label>
+</body>
+</html>
