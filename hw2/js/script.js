@@ -32,14 +32,14 @@ const yAxis = svg.append('g').attr('transform', `translate(61, -10) rotate(+90)`
 
 
 // Part 2: Здесь можно создать шкалы для цвета и радиуса объектов +-
-//const color = d3.scaleOrdinal().range(colors);
-//const r = d3.scaleSqrt().range(params);
+const color = d3.scaleOrdinal(); //.range(colors);
+const r = d3.scaleSqrt(); //.range(params);
 
 // Part 2: для элемента select надо задать options http://htmlbook.ru/html/select
 // и установить selected для дефолтного значения
 
-// d3.select('#radius').selectAll('option')
-//         ...
+d3.select('#radius').selectAll('option');
+
 
 
 // Part 3: то же что делали выше, но для осей
@@ -52,8 +52,9 @@ loadData().then(data => {
 
     // Part 2: здесь мы можем задать пораметр 'domain' для цветовой шкалы
     // для этого нам нужно получить все уникальные значения поля 'region', сделать это можно при помощи 'd3.nest' +-
-    //let regions = d3.nest().key(d => d.region).rollup(d => d[0]).entries(data).map(d => d.key);
-    //color.domain(regions);
+    let regions = d3.nest().key(d => d.region)
+                    .rollup(d => d[0]).entries(data).map(d => d.key);
+    color.domain(regions);
 
     // подписка на изменение позиции ползунка
     d3.select('.slider').on('change', newYear);
@@ -97,39 +98,31 @@ loadData().then(data => {
         yAxis.call(d3.axisBottom(y));  
         
         // Part 2: теперь у нас есть еще одна не постоянная шкала
-        // ...
+        let rRange = data.map(d=> +d[radius][year]);
+        r.domain([d3.min(rRange), d3.max(rRange)]);
 
-        // Part 1, 2: создаем и обновляем состояние точек
-        let xLen = d3.max(xRange)-d3.min(xRange);
-        let yLen = d3.max(yRange)-d3.min(yRange);
-        alert(xLen+" "+yLen+" "+ +data[0][xParam][year]+" "+ +data[0][yParam][year]+" "+ x(+data[0][xParam][year])+" "+y(+data[0][yParam][year]));
-        var p = d3.select("svg")
-            .selectAll("circle")
-            .data(data)
+        let colorRange = data.map(d=> +d[radius][year]);
+        let rLen = d3.max(colorRange)-d3.min(colorRange);
+        color
+            .domain([d3.min(colorRange), rLen/3, rLen*2/3, d3.max(colorRange)])
+            .range(['aqua', 'lime', 'gold', 'hotpink']);
+
+        // Part 1, 2: создаем и обновляем состояние точек  
+
+        alert(radius+" "+r(data[0][radius][year])*15+" "+color(data[0][radius][year]));
+
+        var p = svg.selectAll('circle').data(data)
             .attr('cx', function(d) { return x(+d[xParam][year]); })
             .attr('cy', function(d) { return y(+d[yParam][year]); })
-            .attr('r', 4);
+            .attr('r', function(d) { return r(+d[radius][year])*15; }) //без 15 точки слишком маленькие
+            .style("fill", function(d) { return color(+d[radius][year]); });
 
-        // Create 
         p.enter().append("circle")
-            .attr('cx', function(d) { return x(+d.xParam.year); })
-            .attr('cy', function(d) { return y(+d.yParam.year); })
-            .attr('r', function(d) { return 4; });
+            .attr('cx', function(d) { return x(+d[xParam][year]); })
+            .attr('cy', function(d) { return y(+d[yParam][year]); })
+            .attr('r', function(d) { return r(+d[radius][year])*15; })
+            .style("fill", function(d) { return color(+d[radius][year]); });
 
-        //alert(width*((+data[0][xParam][year]/(xLen/100))/100));
-        /*for (let i = 0; i < 1; i++) { 
-            svg.selectAll('circle').data(data).enter().append("circle")
-                .attr("cx", x(+data[i][xParam][year])) //[""0""][""fertility-rate""][1800]
-                .attr("cy", y(+data[i][yParam][year])) //function (d) { return +d[i][yParam][year]; }
-                .attr("r", 3);
-            alert(i);
-
-        }
-        svg.selectAll('circle').data(data).enter().append("circle")
-            .attr("cx", function (d) { return +d[Xparam][year]; })
-            .attr("cy", function (d) { return +d[Yparam][year]; })
-            .attr("r", radius);
-        //     ...*/
     }
 
     // рисуем график в первый раз
