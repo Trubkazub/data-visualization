@@ -43,7 +43,8 @@ d3.select('#radius').selectAll('option');
 
 
 // Part 3: то же что делали выше, но для осей
-// ...
+d3.select('#xax').selectAll('option');
+d3.select('#yax').selectAll('option');
 
 
 loadData().then(data => {
@@ -63,7 +64,8 @@ loadData().then(data => {
     d3.select('#radius').on('change', newRadius);
 
     // Part 3: подпишемся на изменения селектороы параметров осей
-    // ...
+    d3.select('#xParam').on('change', newXParam);
+    d3.select('#yParam').on('change', newYParam);
 
     // изменяем значение переменной и обновляем график
     function newYear(){
@@ -77,8 +79,21 @@ loadData().then(data => {
         updateChart()
     }
 
+    function newXParam(){
+        // Part 2: по аналогии с newYear +-
+        xParam = this.value;
+        updateChart()
+    }
+
+    function newYParam(){
+        // Part 2: по аналогии с newYear +-
+        yParam = this.value;
+        updateChart()
+    }
+
     function updateChart(){
         // Обновляем все лейблы в соответствии с текущем состоянием
+        //alert(xParam);
         xLable.text(xParam);
         yLable.text(yParam);
         d3.select('.year').text(year);
@@ -108,8 +123,6 @@ loadData().then(data => {
             .range(['aqua', 'lime', 'gold', 'hotpink']);
 
         // Part 1, 2: создаем и обновляем состояние точек  
-
-        alert(radius+" "+r(data[0][radius][year])*15+" "+color(data[0][radius][year]));
 
         var p = svg.selectAll('circle').data(data)
             .attr('cx', function(d) { return x(+d[xParam][year]); })
