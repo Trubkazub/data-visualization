@@ -55,7 +55,8 @@ d3.csv('data/netflix.csv').then(data=>{
         .enter()
         .append("circle")
         .attr('r', d => radius(+d['user rating score']))
-        .style('fill', d => color(d.rating));
+        .style('fill', d => color(d.rating))
+        .style("opacity", 1) //для лучшей разницы;
 
     // добавляем обработчики событий mouseover и mouseout
     nodes.on('mouseover', overBubble).on('mouseout', outOfBubble);
@@ -103,15 +104,18 @@ d3.csv('data/netflix.csv').then(data=>{
         // Part 2 - задать stroke и stroke-width для выделяемого элемента   
         /*bubble
         .selectAll('circle').querySelectorAll( ":hover" )*/
-        //.filter((dd, i) => dd == d)
         d3.select(this)
             .attr('stroke', '#1c1c1c')
             .attr('stroke-width', 1.5);
         
         // Part 3 - обновить содержимое tooltip с использованием классов title и year
-        // ..
-
+        d3.select('.tooltip').html(d.title + "<br>" + d['release year'])
         // Part 3 - изменить display и позицию tooltip
+            .style("left", (d3.event.pageX+0.5*radius(d['user rating score']))+ "px") //eturns the horizontal coordinate of the event relative to the whole document.
+            .style("top", (d3.event.pageY+0.5*radius(d['user rating score'])) + "px")
+            .style('display',"block");
+
+        
         // ..
     }
     function outOfBubble(){
@@ -121,7 +125,7 @@ d3.csv('data/netflix.csv').then(data=>{
             .attr('stroke-width', '');
             
         // Part 3 - изменить display у tooltip
-        // ..
+        tooltip.style('display', 'none');
     }
 
     function overArc(d){
@@ -130,21 +134,30 @@ d3.csv('data/netflix.csv').then(data=>{
         //alert(d.data)
         donut_lable.text(d.data.key);
 
+
         // Part 2 - изменить opacity арки
         d3.select(this)
             .style('opacity', 0.5);
 
         // Part 3 - изменить opacity, stroke и stroke-width для circles в зависимости от rating
-        // ..
+        // pale all
+        nodes.style('opacity', 0.2)
+
+        bubble.selectAll('circle')
+            .filter((dd, i) => dd.rating == d.data.key)
+            .style('opacity', 1)
+            .style("stroke", "black");
     }
     function outOfArc(){
         // Part 2 - изменить содержимое donut_lable
         donut_lable.text('');
+
         // Part 2 - изменить opacity арки
         d3.select(this)
             .style('opacity', 1);
 
         // Part 3 - вернуть opacity, stroke и stroke-width для circles
-        // ..
+        nodes.style('opacity', 1)
+            .attr('stroke-width', 0);
     }
 });
