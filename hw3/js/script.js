@@ -88,16 +88,25 @@ d3.csv('data/netflix.csv').then(data=>{
         .enter().append('path')
         .attr('d', arc) // каждый элемент будет передан в генератор
         .attr('fill', d => color(d.data.key))
-        .style("opacity", 0.7);
+        .style("opacity", 1) //для лучшей разницы
+        .on('mouseover', overArc) // добавляем обработчики событий mouseover и mouseout
+        .on('mouseout', outOfArc);
 
-    // добавляем обработчики событий mouseover и mouseout
-    donut.on('mouseover', overArc)
-        .on('mouseout', outOfArc); 
+    /*var currentElement = null;
+
+    document.addEventListener('mouseover', function (e) {
+        currentElement = e.target;
+    });*/
 
     function overBubble(d){
         console.log(d)
         // Part 2 - задать stroke и stroke-width для выделяемого элемента   
-        // ..
+        /*bubble
+        .selectAll('circle').querySelectorAll( ":hover" )*/
+        //.filter((dd, i) => dd == d)
+        d3.select(this)
+            .attr('stroke', '#1c1c1c')
+            .attr('stroke-width', 1.5);
         
         // Part 3 - обновить содержимое tooltip с использованием классов title и year
         // ..
@@ -107,7 +116,9 @@ d3.csv('data/netflix.csv').then(data=>{
     }
     function outOfBubble(){
         // Part 2 - сбросить stroke и stroke-width
-        // ..
+        d3.select(this)
+            .attr('stroke', '')
+            .attr('stroke-width', '');
             
         // Part 3 - изменить display у tooltip
         // ..
@@ -116,18 +127,22 @@ d3.csv('data/netflix.csv').then(data=>{
     function overArc(d){
         console.log(d)
         // Part 2 - изменить содержимое donut_lable
-        // ..
+        //alert(d.data)
+        donut_lable.text(d.data.key);
+
         // Part 2 - изменить opacity арки
-        // ..
+        d3.select(this)
+            .style('opacity', 0.5);
 
         // Part 3 - изменить opacity, stroke и stroke-width для circles в зависимости от rating
         // ..
     }
     function outOfArc(){
         // Part 2 - изменить содержимое donut_lable
-        // ..
+        donut_lable.text('');
         // Part 2 - изменить opacity арки
-        // ..
+        d3.select(this)
+            .style('opacity', 1);
 
         // Part 3 - вернуть opacity, stroke и stroke-width для circles
         // ..
