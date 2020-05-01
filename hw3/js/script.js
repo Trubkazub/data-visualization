@@ -8,7 +8,7 @@ const colors = [
     '#fdbf6f','#ff7f00','#cab2d6',
     '#6a3d9a','#ffff99','#b15928']
 
-// Part 1: Создать шкалы для цвета, радиуса и позиции 
+// Part 1: Создать шкалы для цвета, радиуса и позиции +
 const radius = d3.scaleLinear().range([.5, 20]);
 const color = d3.scaleOrdinal().range(colors);
 const x = d3.scaleLinear().range([0, b_width]);
@@ -18,7 +18,7 @@ const bubble = d3.select('.bubble-chart')
 const donut = d3.select('.donut-chart')
     .attr('width', d_width).attr('height', d_height)
     .append("g")
-        .attr("transform", "translate(" + d_width / 2 + "," + d_height / 2 + ")");
+    .attr("transform", "translate(" + d_width / 2 + "," + d_height / 2 + ")");
 
 const donut_lable = d3.select('.donut-chart').append('text')
         .attr('class', 'donut-lable')
@@ -26,9 +26,12 @@ const donut_lable = d3.select('.donut-chart').append('text')
         .attr('transform', `translate(${(d_width/2)} ${d_height/2})`);
 const tooltip = d3.select('.tooltip');
 
-//  Part 1 - Создать симуляцию с использованием forceCenter(), forceX() и forceCollide()
+//  Part 1 - Создать симуляцию с использованием forceCenter(), forceX() и forceCollide() +-
 const simulation = d3.forceSimulation()
-    // ..
+        //.nodes(nodes)
+        .force("center", d3.forceCenter(b_width / 2, b_height / 2))
+        .force("force_x", d3.forceX(d => x(d['release year'])))
+        .force("collide", d3.forceCollide().radius(d => radius(d['user rating score'])));
 
 
 d3.csv('data/netflix.csv').then(data=>{
@@ -41,32 +44,55 @@ d3.csv('data/netflix.csv').then(data=>{
     
     
     // Part 1 - задать domain  для шкал цвета, радиуса и положения по x
-    // ..
-    
+    color.domain(ratings);
+    radius.domain([d3.min(rating), d3.max(rating)]);
+    x.domain([d3.min(years), d3.max(years)]);
+
     // Part 1 - создать circles на основе data
     var nodes = bubble
         .selectAll("circle")
-        // ..
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr('r', d => radius(+d['user rating score']))
+        .style('fill', d => color(d.rating));
+
     // добавляем обработчики событий mouseover и mouseout
-            // .on('mouseover', overBubble)
-            // .on('mouseout', outOfBubble);
+    nodes.on('mouseover', overBubble).on('mouseout', outOfBubble);
 
     
     // Part 1 - передать данные в симуляцию и добавить обработчик события tick
-    // ..
+    function ticked() {
+        nodes.attr("cx", function(d) { return d.x; })
+            .attr("cy", function(d) { return d.y; });
+    }
 
+    simulation.nodes(data).on("tick", ticked);
+
+    
     // Part 1 - Создать шаблон при помощи d3.pie() на основе ratings
-    // ..
+    var ratings_sample = d3.pie()
+        //.value(ratings); //?
+        .value(d => d.value );
     
     // Part 1 - Создать генератор арок при помощи d3.arc()
-    // ..
+    var arc = d3.arc()
+        .innerRadius(150) // it'll be donut chart
+        .outerRadius(250)
+        .padAngle(0.02)
+        .cornerRadius(5);
     
     // Part 1 - построить donut chart внутри donut
-    // ..
+    donut.selectAll('path')
+        .data(ratings_sample(ratings))
+        .enter().append('path')
+        .attr('d', arc) // каждый элемент будет передан в генератор
+        .attr('fill', d => color(d.data.key))
+        .style("opacity", 0.7);
 
     // добавляем обработчики событий mouseover и mouseout
-        //.on('mouseover', overArc)
-        //.on('mouseout', outOfArc);
+    donut.on('mouseover', overArc)
+        .on('mouseout', outOfArc); 
 
     function overBubble(d){
         console.log(d)
